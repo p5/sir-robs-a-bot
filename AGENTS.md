@@ -20,4 +20,6 @@ Run `./buck2 run //tooling:fmt` to format Buck files.
 Run `./buck2 audit visibility //... toolchains//...` for build graph changes.
 Keep repository checks local. They read Git metadata and untracked files.
 
+For substantial tasks and handoffs, follow [agent work](docs/agent-work.md).
+
 Buck2 is the build system. See `docs/build-system.md`.

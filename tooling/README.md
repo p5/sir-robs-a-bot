@@ -10,7 +10,15 @@ export PATH="$PWD/.tools/bin:$PATH"
 
 The verifier audits visibility, builds all root-cell targets, and runs all root-cell tests.
 CI invokes this same command.
-Set `BUCK2_REPORT_DIR` to retain build reports outside the source tree.
+Set `BUCK2_REPORT_DIR` to retain reports outside the source tree.
+Each invocation creates a separate `verification.*` directory and prints its path.
+The directory contains Buck build reports and `verification.json`.
+The summary records the revision, Git worktree status, start time, commands, exit codes, and overall outcome.
+A failed command stops verification and produces a failed outcome.
+A running report is incomplete. Missing steps do not count as passes.
+Git worktree status lists changed paths. It does not preserve their contents.
+Follow [agent work](../docs/agent-work.md) when you need evidence for uncommitted changes.
+Report setup failures may leave no summary. The command exit status remains authoritative.
 
 ## Layout
 

@@ -81,6 +81,21 @@ Inspect the test summary. An exit code of zero with no tests does not prove beha
 Introduce a deliberate behavior error in a disposable checkout.
 Confirm that the corresponding test fails, then restore the implementation.
 
+For projects with a runtime interface, document and execute a verification procedure:
+
+1. Build and launch the actual artifact with isolated test configuration.
+2. Check readiness and confirm that the instance uses the intended build.
+3. Exercise a real operation through the public interface.
+4. Inspect the result and observable side effects, such as files, records, or emitted messages.
+5. Capture commands, outcomes, and evidence outside the source tree.
+6. Stop owned processes and remove temporary state. Preserve the evidence.
+
+Include a failure case where the interface supports it.
+For libraries, exercise the public API through a consumer test.
+Put repeatable verification steps in Buck targets.
+Document required external systems and checks that cannot run locally.
+Do not replace unavailable behavior checks with successful placeholders.
+
 ## 5. Write the project README
 
 Include these details:
