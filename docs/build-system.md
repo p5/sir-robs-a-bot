@@ -78,12 +78,10 @@ If a native manifest owns external dependency resolution, generate Buck targets 
 Document the generation command and pin the generator.
 Do not maintain both graphs by hand.
 
-The [language experiment](build-system-results.md) records Go, Rust, and TypeScript findings.
 Complete each integration when its first project needs it.
 Add templates only when they have real users.
 
-Follow the [scale review](buck2-scale-review.md) when you add language integrations or build infrastructure.
-That review defines acceptance checks for dependency generation, invalidation, editor support, and remote execution.
+Follow the [build integration guide](build-integration.md) for dependency generation, invalidation, editor support, and remote execution.
 
 ## CI and upgrades
 
@@ -105,4 +103,4 @@ To upgrade DotSlash, update its version and archive digests in `tooling/scripts/
 Keep agent workspaces and execution artifacts outside the source tree.
 
 See [repository tooling](../tooling/README.md) for individual checks and tool layout.
-See [the dependency audit](dependency-audit.md) for current release pins.
+See [tool maintenance](../tooling/README.md#update-tools) for release sources and upgrade procedures.

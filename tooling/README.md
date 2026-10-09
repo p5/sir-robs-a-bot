@@ -46,7 +46,7 @@ Do not reuse this rule for hermetic application tests.
 
 The launcher validator checks local consistency, not upstream release freshness.
 It does not download binaries for platforms other than the host.
-See [the dependency audit](../docs/dependency-audit.md) for release sources and update instructions.
+See [Update tools](#update-tools) for release sources and update instructions.
 
 Actionlint's runner metadata predates Ubuntu 26.04.
 The narrow entry in `.github/actionlint.yaml` permits that verified GitHub-hosted label.
@@ -59,3 +59,39 @@ Declare the implementation and launchers in the target resources.
 For checkout-dependent checks, use the existing scaffold resource bundle.
 Add a regression case when a failure could produce a false success.
 Run the full verifier after changes to shared rules or tools.
+
+## Update tools
+
+Keep tool versions and digests in their executable manifests or bootstrap script.
+Keep Action commit pins in `.github/workflows/`.
+Dependabot proposes weekly Action updates. Tool manifests require a separate upstream release check.
+
+| Tool | Release source | Pin location |
+| --- | --- | --- |
+| Buck2 and formatter | [Buck2 releases](https://github.com/facebook/buck2/releases) | `buck2`, `tooling/bin/starlark-fmt` |
+| DotSlash | [DotSlash releases](https://github.com/facebook/dotslash/releases) | `tooling/scripts/bootstrap.sh` |
+| Actionlint | [Actionlint releases](https://github.com/rhysd/actionlint/releases) | `tooling/bin/actionlint` |
+| ShellCheck | [ShellCheck releases](https://github.com/koalaman/shellcheck/releases) | `tooling/bin/shellcheck` |
+| jq | [jq releases](https://github.com/jqlang/jq/releases) | `tooling/bin/jq` |
+| GitHub Actions | The action repository's release page | `.github/workflows/` |
+
+1. Select the latest stable tool release, or a dated Buck2 release.
+2. Resolve Action release tags to full commit SHAs.
+3. Check runtime requirements and changed inputs.
+4. Update manifests from upstream assets and verify their digests.
+5. Update every supported platform entry in the same change.
+6. Update Buck2 and its formatter from the same dated release.
+7. For DotSlash, update the bootstrap version and every archive digest.
+8. Run `./buck2 run //tooling:fmt` and `./buck2 run //tooling:verify`.
+9. Test bootstrap and verification from a fresh checkout.
+
+Use upstream checksums or release asset digest metadata.
+Avoid moving snapshot URLs for pinned tools.
+
+## Add maintenance tools when needed
+
+Add dependency metadata checks with the first dependency generator.
+Add ownership routing when multiple maintainers need it.
+Create project templates only after an integration has repeated users.
+Add upgrade automation, selective CI, sharding, or remote caches when measured work justifies them.
+Keep repository settings management and maintenance reconcilers separate from the current scaffold.

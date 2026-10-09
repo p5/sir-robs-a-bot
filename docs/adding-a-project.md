@@ -35,9 +35,8 @@ If the language has no configured toolchain, add it to `toolchains/` with this p
 Pin compilers, runtimes, linkers, generators, and bootstrap tools that the rules need.
 Record host tools that remain required.
 
-Complete the language-specific checks in the [scale review](buck2-scale-review.md#requirements-for-each-language-integration).
+Complete the language-specific checks in the [build integration guide](build-integration.md#acceptance-checks).
 The scaffold does not yet configure Go, Rust, or TypeScript builds.
-Do not copy the disposable experiment as a production template.
 
 ## 3. Declare targets and dependencies
 

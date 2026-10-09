@@ -12,8 +12,7 @@ Use `packages/<name>` for a shared library.
 Name projects for their purpose, not their language.
 
 Add directories when they have real contents.
-The top-level placeholders reserve places for future projects.
-They do not prescribe service names, languages, or deployment topology.
+The directory conventions do not prescribe service names, languages, or deployment topology.
 
 ## Project documentation
 

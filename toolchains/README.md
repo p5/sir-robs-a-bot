@@ -12,7 +12,7 @@ Use downloaded distributions for reproducible builds.
 Do not copy the complete demo toolchain set into this cell.
 It assumes tools from the host and configures languages that this repository does not yet use.
 
-Go, Rust, and TypeScript integration findings are in [the evaluation report](../docs/build-system-results.md).
+Follow the [build integration guide](../docs/build-integration.md) when adding language toolchains.
 
 Bundled test rules can require a Python bootstrap toolchain.
 If a rule needs Python, use a virtual environment with `uv` and pin the distribution.

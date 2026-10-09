@@ -10,7 +10,7 @@ Read [repository conventions](docs/repository.md) before you add a project.
 Read [the glossary](CONTEXT.md) for the factory terms.
 Read [the build guide](docs/build-system.md) for setup and project integration.
 Follow [the new project guide](docs/adding-a-project.md) when you add a project.
-See [maintenance tooling priorities](docs/repository-maintenance.md) for future repository tools.
+See [repository tooling](tooling/README.md) for checks and maintenance procedures.
 
 ## Start development
 
@@ -41,5 +41,6 @@ Add application targets and language toolchains with their first projects.
 | `deploy/` | Deployment configuration, added when needed |
 | `docs/` | Repository conventions, decisions, and runbooks |
 
+Create these directories when their first projects arrive.
 Organize projects by purpose. Choose the language inside each project.
 Keep repositories that agents modify outside this source tree.
