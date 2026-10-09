@@ -1,0 +1,58 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository:
+    name: Buck2 on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned DotSlash
+        run: |
+          bash tooling/scripts/bootstrap.sh
+          echo "$GITHUB_WORKSPACE/.tools/bin" >> "$GITHUB_PATH"
+      - name: Verify repository
+        env:
+          BUCK2_REPORT_DIR: ${{ runner.temp }}
+        run: ./buck2 run //tooling:verify
+      - name: Retain verification reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: buck2-reports-${{ matrix.os }}
+          path: ${{ runner.temp }}/verification.*/*.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  verify:
+    name: verify
+    needs: repository
+    if: ${{ always() }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 1
+    steps:
+      - name: Require every verification job to pass
+        env:
+          REPOSITORY_RESULT: ${{ needs.repository.result }}
+        run: test "$REPOSITORY_RESULT" = success

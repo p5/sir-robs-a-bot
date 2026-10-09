@@ -1,0 +1,17 @@
+filegroup(
+    name = "files",
+    srcs = glob(["BUCK", "*.sh"]),
+    visibility = ["root//..."],
+)
+
+sh_binary(
+    name = "fmt",
+    main = "format-starlark.sh",
+    visibility = ["//tooling:fmt"],
+)
+
+sh_binary(
+    name = "verify",
+    main = "verify.sh",
+    visibility = ["//tooling:verify"],
+)
