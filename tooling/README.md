@@ -57,8 +57,8 @@ It does not download binaries for platforms other than the host.
 See [Update tools](#update-tools) for release sources and update instructions.
 
 Actionlint's runner metadata predates Ubuntu 26.04.
-The narrow entry in `.github/actionlint.yaml` permits that verified GitHub-hosted label.
-Remove the entry when a future Actionlint release recognizes it.
+The entries in `.github/actionlint.yaml` permit the x86_64 and ARM64 GitHub-hosted runner labels.
+Remove these entries when a future Actionlint release recognizes the labels.
 
 ## Change a check
 

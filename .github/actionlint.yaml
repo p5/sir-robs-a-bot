@@ -1,6 +1,7 @@
-# Actionlint 1.7.12 predates this supported GitHub-hosted runner label.
+# Actionlint 1.7.12 predates this supported GitHub-hosted runner labels.
 # https://github.blog/changelog/2026-09-17-ubuntu-26-generally-available-and-latest-migration/
 # This lint configuration does not change where GitHub schedules jobs.
 self-hosted-runner:
   labels:
     - ubuntu-26.04
+    - ubuntu-26.04-arm

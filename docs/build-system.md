@@ -85,7 +85,7 @@ Follow the [build integration guide](build-integration.md) for dependency genera
 
 ## CI and upgrades
 
-CI runs the shared verification command on Ubuntu 26.04.
+CI runs the shared verification command on Ubuntu 26.04 for x86_64 and ARM64.
 The bootstrap also supports macOS, but the current CI workflow has Linux coverage only.
 The workflow bootstraps the pinned DotSlash runtime.
 It audits target visibility and retains JSON build reports for 14 days.
