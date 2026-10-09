@@ -1,0 +1,14 @@
+{
+  "IsSortableListArg": {
+    "deps": true,
+    "resources": true,
+    "srcs": true,
+    "tests": true,
+    "visibility": true
+  },
+  "SortableBlacklist": {},
+  "NamePriority": {
+    "name": -99,
+    "visibility": 50
+  }
+}

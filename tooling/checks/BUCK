@@ -1,0 +1,35 @@
+load("//tooling/rules:repository_check.bzl", "repository_check")
+
+filegroup(
+    name = "files",
+    srcs = glob(["BUCK", "*.sh", "*.jq"]),
+    visibility = ["root//..."],
+)
+
+sh_binary(
+    name = "repository",
+    main = "repository.sh",
+    visibility = ["//:check"],
+)
+
+sh_binary(
+    name = "lint-command",
+    main = "lint.sh",
+)
+
+repository_check(
+    name = "lint",
+    command = ":lint-command",
+    resources = ["//:scaffold"],
+)
+
+sh_binary(
+    name = "tool-pins-command",
+    main = "tool-pins.sh",
+)
+
+repository_check(
+    name = "tool-pins",
+    command = ":tool-pins-command",
+    resources = ["//:scaffold"],
+)

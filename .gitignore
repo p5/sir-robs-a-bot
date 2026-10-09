@@ -1,0 +1,26 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+mise.local.toml
+.mise.local.toml
+.buckconfig.local
+
+# Local agent work and execution artifacts
+/.worktrees/
+/.workspaces/
+/.artifacts/
+
+# Tool caches and build outputs
+node_modules/
+target/
+buck-out/
+.cache/
+/.tools/
+*.tsbuildinfo
+
+# Editor and operating system files
+.DS_Store
+*.swp
+*.swo

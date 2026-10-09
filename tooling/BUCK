@@ -1,0 +1,23 @@
+filegroup(
+    name = "files",
+    srcs = {
+        "BUCK": "BUCK",
+        "README.md": "README.md",
+        "bin": "//tooling/bin:files",
+        "checks": "//tooling/checks:files",
+        "rules": "//tooling/rules:files",
+        "scripts": "//tooling/scripts:files",
+        "tests": "//tooling/tests:files",
+    },
+    visibility = ["root//..."],
+)
+
+alias(
+    name = "fmt",
+    actual = "//tooling/scripts:fmt",
+)
+
+alias(
+    name = "verify",
+    actual = "//tooling/scripts:verify",
+)
