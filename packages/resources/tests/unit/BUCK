@@ -1,0 +1,14 @@
+go_test(
+    name = "test",
+    deps = [
+        "//packages/reconcile/datastore:datastore",
+        "//packages/resources:resources",
+        "//packages/resources/content:content",
+        "//packages/resources/content/memory:memory",
+        "//packages/resources/datastore:datastore",
+        "//packages/resources/datastore/memory:memory",
+        "//packages/resources/datastore/storetest:storetest",
+    ],
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources/tests/unit",
+    srcs = glob(["*.go"]),
+)

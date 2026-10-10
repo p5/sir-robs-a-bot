@@ -1,0 +1,22 @@
+go_library(
+    name = "dynamodb",
+    deps = [
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue:attributevalue",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb:dynamodb",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb/types:types",
+        "//packages/resources/content:content",
+        "//packages/resources/datastore:datastore",
+    ],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources/datastore/dynamodb",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    visibility = ["//packages/resources/...", "//services/intake/..."],
+)
+
+go_test(
+    name = "test",
+    deps = [],
+    srcs = glob(["*_test.go"]),
+    target_under_test = ":dynamodb",
+)

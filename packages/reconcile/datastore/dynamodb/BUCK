@@ -13,5 +13,5 @@ go_library(
     package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/datastore/dynamodb",
     srcs = glob(["*.go"]),
     tests = ["//packages/reconcile/datastore/dynamodb/tests:test"],
-    visibility = ["//packages/reconcile/..."],
+    visibility = ["//packages/reconcile/...", "//packages/resources/...", "//services/intake/..."],
 )

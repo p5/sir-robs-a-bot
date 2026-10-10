@@ -9,6 +9,7 @@ filegroup(
         ".editorconfig",
         ".github/**",
         ".gitignore",
+        ".gitattributes",
         ".starlark-format.json",
         "*.md",
         "BUCK",

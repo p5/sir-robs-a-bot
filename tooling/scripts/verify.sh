@@ -54,6 +54,7 @@ run_step() {
 }
 
 run_step bash packages/reconcile/dependencies/check.sh
+run_step bash packages/resources/dependencies/check.sh
 
 # Buck2 has finished the run target's build before it starts this command.
 run_step ./buck2 audit visibility //... toolchains//...
@@ -65,4 +66,6 @@ else
   run_step ./buck2 test //...
 fi
 run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash packages/reconcile/checks/adversarial.sh
+run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash services/intake/checks/verify.sh
+run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash packages/resources/checks/verify.sh
 outcome=passed

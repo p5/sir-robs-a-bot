@@ -1,0 +1,8 @@
+go_library(
+    name = "storetest",
+    deps = ["//packages/reconcile/datastore:datastore", "//packages/resources/content:content", "//packages/resources/datastore:datastore"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources/datastore/storetest",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    visibility = ["//packages/resources/...", "//services/intake/tests:test"],
+)

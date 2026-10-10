@@ -1,0 +1,15 @@
+go_binary(
+    name = "intake",
+    cgo_enabled = False,
+    deps = [
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/postgres:postgres",
+        "//packages/reconcile/vendor/github.com/lib/pq:pq",
+        "//services/intake/internal/intake:intake",
+        "//services/intake/internal/persistence:persistence",
+        "//services/intake/internal/providers/github:github",
+        "//services/intake/internal/providers/gitlab:gitlab",
+    ],
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    visibility = ["//services/intake/tests:test"],
+)

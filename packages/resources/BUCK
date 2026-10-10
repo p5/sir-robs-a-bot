@@ -1,0 +1,14 @@
+go_library(
+    name = "resources",
+    deps = ["//packages/reconcile/datastore:datastore", "//packages/resources/content:content", "//packages/resources/datastore:datastore"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    visibility = ["//packages/resources/...", "//services/intake/..."],
+)
+genrule(
+    name = "fmt-check",
+    cmd = '$(exe toolchains//:gofmt) -l $SRCS > "$OUT"; test ! -s "$OUT"',
+    out = "unformatted.txt",
+    srcs = glob(["**/*.go"], exclude = ["vendor/**"]),
+)

@@ -5,7 +5,7 @@ go_library(
     package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/datastore/memory",
     srcs = glob(["*.go"], exclude = ["*_test.go"]),
     tests = [":test"],
-    visibility = ["//packages/reconcile/..."],
+    visibility = ["//packages/reconcile/...", "//packages/resources/..."],
 )
 
 go_test(

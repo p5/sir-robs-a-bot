@@ -1,0 +1,26 @@
+go_library(
+    name = "persistence",
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/dynamodb:dynamodb",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb:dynamodb",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb/types:types",
+        "//packages/resources/content/s3:s3",
+        "//packages/resources/datastore/dynamodb:dynamodb",
+        "//packages/resources/vendor/github.com/aws/aws-sdk-go-v2/service/s3:s3",
+        "//services/intake/internal/intake:intake",
+        "//services/intake/vendor/github.com/aws/aws-sdk-go-v2/config:config",
+    ],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/services/intake/internal/persistence",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    tests = [":test"],
+    visibility = ["//services/intake/..."],
+)
+
+go_test(
+    name = "test",
+    srcs = glob(["*_test.go"]),
+    target_under_test = ":persistence",
+)

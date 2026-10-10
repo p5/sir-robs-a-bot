@@ -41,7 +41,7 @@ See [Buck2 installation](https://buck2.build/docs/getting_started/install/).
 The source bundle declares scaffold inputs. It is not a release artifact.
 Future projects add targets such as `//services/<name>:<target>`.
 The reconciliation library has Go build and consumer-test targets.
-No factory application exists yet.
+The factory entrypoint has Go build, ingress, and executable integration targets.
 
 ## Cells and execution
 
@@ -121,3 +121,19 @@ gobuckify generates vendored Buck targets from that module graph. Buck builds
 libraries and tests from those generated declarations. The repository verifier
 checks generated dependencies for drift.
 See [the library guide](../packages/reconcile/README.md) for current integration limits.
+
+The intake service uses its own Go module with local replacements for the
+reconciliation and resource libraries. It reuses their generated dependency
+projections and retains only additional dependency packages in its vendor tree.
+Its verifier checks module metadata, selected versions, and generated targets.
+Regenerate the service projection after changing its module dependencies.
+
+## Resource dependencies
+
+The resource module owns its dependencies in `packages/resources/go.mod` and
+`go.sum`. Its generator uses the bundled gobuckify and reuses identical packages
+from the queue module's generated projection. Only additional packages remain in
+`packages/resources/vendor`. Python 3 runs the deterministic projection step.
+Run `bash packages/resources/dependencies/generate.sh` after dependency changes.
+The root verifier regenerates and compares this projection. Native Go checks use
+`-mod=mod`; the Buck projection is intentionally not a complete native vendor tree.

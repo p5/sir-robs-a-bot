@@ -1,0 +1,15 @@
+go_binary(
+    name = "request-run",
+    cgo_enabled = False,
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/memory:memory",
+        "//packages/resources:resources",
+        "//packages/resources/content/memory:memory",
+        "//packages/resources/datastore/memory:memory",
+        "//packages/resources/examples/request-run:request-run",
+    ],
+    srcs = ["main.go"],
+    visibility = ["//packages/resources/tests:test"],
+)

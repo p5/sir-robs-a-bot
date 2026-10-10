@@ -1,0 +1,16 @@
+go_library(
+    name = "gitlab",
+    deps = ["//services/intake/internal/intake:intake"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/services/intake/internal/providers/gitlab",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    tests = [":test", "//services/intake/tests:test"],
+    visibility = ["//services/intake/..."],
+)
+
+go_test(
+    name = "test",
+    deps = ["//services/intake/internal/intake:intake"],
+    srcs = glob(["*_test.go"]),
+    target_under_test = ":gitlab",
+)

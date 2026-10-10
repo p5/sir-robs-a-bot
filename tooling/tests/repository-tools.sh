@@ -83,7 +83,11 @@ rm -- .github/workflows/invalid.yml
 
 # Vendored sources retain upstream formatting and scripts. Generated Buck
 # metadata still follows repository formatting and the dependency drift check.
-mkdir -p packages/reconcile/vendor/example
+mkdir -p packages/reconcile/vendor/example packages/resources/vendor/example services/intake/vendor/example
+printf 'trailing space \n' >services/intake/vendor/example/README.md
+printf 'if then\n' >services/intake/vendor/example/upstream.sh
+printf 'trailing space \n' >packages/resources/vendor/example/README.md
+printf 'if then\n' >packages/resources/vendor/example/upstream.sh
 printf 'trailing space \n' >packages/reconcile/vendor/example/README.md
 printf 'if then\n' >packages/reconcile/vendor/example/upstream.sh
 bash tooling/checks/repository.sh >"$fixture_root/result.log" 2>&1
@@ -96,8 +100,11 @@ bash tooling/scripts/format-starlark.sh >"$fixture_root/result.log" 2>&1
 bash tooling/checks/repository.sh >"$fixture_root/result.log" 2>&1
 
 # Exercise the verifier with a disposable command, not recursive Buck builds.
-mkdir -p packages/reconcile/dependencies packages/reconcile/checks
+mkdir -p packages/reconcile/dependencies packages/reconcile/checks services/intake/checks packages/resources/dependencies packages/resources/checks
 printf '#!/usr/bin/env bash\nexit 0\n' >packages/reconcile/dependencies/check.sh
+printf '#!/usr/bin/env bash\nexit 0\n' >services/intake/checks/verify.sh
+printf '#!/usr/bin/env bash\nexit 0\n' >packages/resources/checks/verify.sh
+printf '#!/usr/bin/env bash\nexit 0\n' >packages/resources/dependencies/check.sh
 cat >packages/reconcile/checks/adversarial.sh <<'CHECK'
 #!/usr/bin/env bash
 if [[ ${VERIFY_FAIL_STEP:-} == adversarial ]]; then exit 42; fi
@@ -127,10 +134,11 @@ for failed_step in audit build test adversarial none; do
   fi
   report=$(sed -n 's/^Verification reports: //p' "$fixture_root/verify.log")
   case "$failed_step" in
-    audit) count=2 ;;
-    build) count=3 ;;
-    test) count=4 ;;
-    adversarial|none) count=5 ;;
+    audit) count=3 ;;
+    build) count=4 ;;
+    test) count=5 ;;
+    adversarial) count=6 ;;
+    none) count=8 ;;
   esac
   ./tooling/bin/jq -e --arg revision "$(git rev-parse HEAD)" \
     --arg failed_step "$failed_step" --argjson count "$count" '
@@ -139,17 +147,30 @@ for failed_step in audit build test adversarial none; do
     (.worktree_status | contains("?? \"untracked input.txt\"")) and
     (.steps | length) == $count and
     .steps[0].command == ["bash", "packages/reconcile/dependencies/check.sh"] and
-    .steps[1].command == ["./buck2", "audit", "visibility", "//...", "toolchains//..."] and
+    .steps[1].command == ["bash", "packages/resources/dependencies/check.sh"] and
+    .steps[2].command == ["./buck2", "audit", "visibility", "//...", "toolchains//..."] and
     (if $failed_step == "none" then
        .outcome == "passed" and .exit_code == 0 and all(.steps[]; .exit_code == 0)
      else
        .outcome == "failed" and .exit_code == 42 and .steps[-1].exit_code == 42
      end)' "$report/verification.json" >/dev/null
-  buck_commands=$((count - 1))
-  if [[ $failed_step == adversarial || $failed_step == none ]]; then buck_commands=$((count - 2)); fi
+  buck_commands=$((count - 2))
+  if [[ $failed_step == adversarial ]]; then buck_commands=$((count - 3)); fi
+  if [[ $failed_step == none ]]; then buck_commands=$((count - 5)); fi
   [[ $(wc -l <"$VERIFY_COMMAND_LOG") -eq $buck_commands ]]
 done
 [[ $(find "$BUCK2_REPORT_DIR" -name verification.json | wc -l) -eq 5 ]]
+# A failed application check must also fail the aggregate verifier and report.
+mkdir -p services/intake/checks
+printf 'module fixture\n' >services/intake/go.mod
+printf '#!/usr/bin/env bash\nexit 42\n' >services/intake/checks/verify.sh
+export VERIFY_FAIL_STEP=none
+expect_failure 'Verification reports:' bash tooling/scripts/verify.sh
+report=$(sed -n 's/^Verification reports: //p' "$fixture_root/result.log")
+./tooling/bin/jq -e '.outcome == "failed" and .exit_code == 42 and
+  (.steps | length) == 7 and
+  .steps[-1].command[-1] == "services/intake/checks/verify.sh"' "$report/verification.json" >/dev/null
+rm -rf services
 export BUCK2_REPORT_DIR="$checkout/forbidden-reports"
 expect_failure 'Keep verification reports outside the source tree.' bash tooling/scripts/verify.sh
 unset BUCK2_REPORT_DIR VERIFY_FAIL_STEP VERIFY_COMMAND_LOG

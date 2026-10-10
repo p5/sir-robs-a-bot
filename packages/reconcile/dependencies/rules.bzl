@@ -1,5 +1,5 @@
 def dependency_library(**kwargs):
-    kwargs["visibility"] = ["//packages/reconcile/..."]
+    kwargs["visibility"] = ["//packages/reconcile/...", "//services/intake/...", "//packages/resources/..."]
     kwargs["override_cgo_enabled"] = False
     # gobuckify omits go:embed assets. Keep this package's upstream schema
     # defaults in the compile inputs without editing its generated target.
