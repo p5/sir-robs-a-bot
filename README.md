@@ -1,11 +1,13 @@
 # sir-robs-a-bot
 
-An agent software factory for software development and agent-powered applications.
+A distributed agent software factory for software development and agent-powered applications.
 Both use a shared agent execution platform.
 
 This repository contains the factory source and shared project conventions.
-Service names, module designs, and implementation languages remain open.
+The controller and its reconcilers use Go.
+Service names, module designs, and languages for other projects remain open.
 
+Read [the architecture](docs/architecture.md) for the intended factory core.
 Read [repository conventions](docs/repository.md) before you add a project.
 Read [the glossary](CONTEXT.md) for the factory terms.
 Read [the build guide](docs/build-system.md) for setup and project integration.
@@ -24,7 +26,8 @@ export PATH="$PWD/.tools/bin:$PATH"
 
 The scaffold checks shell syntax, whitespace, Starlark formatting, workflows, and tool pins.
 Run `./buck2 run //tooling:fmt` to apply Starlark formatting.
-Add application targets and language toolchains with their first projects.
+The [reconciliation library](packages/reconcile/README.md) uses the pinned Go toolchain.
+Add other language toolchains with their first projects.
 
 ## Repository layout
 

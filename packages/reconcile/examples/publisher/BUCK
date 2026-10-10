@@ -1,0 +1,17 @@
+go_library(
+    name = "publisher",
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/dynamodb:dynamodb",
+        "//packages/reconcile/datastore/postgres:postgres",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/aws:aws",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb:dynamodb",
+    ],
+    embed_srcs = ["schema.sql"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/examples/publisher",
+    srcs = glob(["*.go"]),
+    tests = ["//packages/reconcile/examples/publisher/tests:test"],
+    visibility = ["//packages/reconcile/examples/publisher/..."],
+)

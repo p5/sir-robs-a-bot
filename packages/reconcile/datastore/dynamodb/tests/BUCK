@@ -1,0 +1,14 @@
+go_test(
+    name = "test",
+    cgo_enabled = False,
+    deps = [
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/dynamodb:dynamodb",
+        "//packages/reconcile/datastore/storetest:storetest",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/aws:aws",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb:dynamodb",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb/types:types",
+    ],
+    package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/datastore/dynamodb/tests",
+    srcs = glob(["*_test.go"]),
+)

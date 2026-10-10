@@ -1,0 +1,18 @@
+go_test(
+    name = "test",
+    cgo_enabled = False,
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/postgres:postgres",
+        "//packages/reconcile/examples/publisher:publisher",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/aws:aws",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb:dynamodb",
+        "//packages/reconcile/vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb/types:types",
+        "//packages/reconcile/vendor/github.com/lib/pq:pq",
+        "//packages/reconcile/vendor/github.com/prometheus/client_golang/prometheus:prometheus",
+    ],
+    env = {"PUBLISHER_BINARY": "$(exe //packages/reconcile/examples/publisher/cmd:publisher)"},
+    package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/examples/publisher/tests",
+    srcs = glob(["*_test.go"]),
+)
