@@ -1,0 +1,8 @@
+go_library(
+    name = "teststore",
+    deps = ["//packages/reconcile/datastore/memory:memory"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/internal/teststore",
+    srcs = glob(["*.go"]),
+    visibility = ["//packages/reconcile/tests:test"],
+)

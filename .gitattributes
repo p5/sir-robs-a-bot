@@ -1,0 +1,2 @@
+# Dependency sources and Buck targets are generated from go.mod and go.sum.
+packages/reconcile/vendor/** linguist-vendored linguist-generated

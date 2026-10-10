@@ -1,0 +1,8 @@
+go_library(
+    name = "storetest",
+    deps = ["//packages/reconcile/datastore:datastore"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/datastore/storetest",
+    srcs = glob(["*.go"]),
+    visibility = ["//packages/reconcile/..."],
+)

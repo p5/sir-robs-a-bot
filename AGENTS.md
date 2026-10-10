@@ -23,3 +23,6 @@ Keep repository checks local. They read Git metadata and untracked files.
 For substantial tasks and handoffs, follow [agent work](docs/agent-work.md).
 
 Buck2 is the build system. See `docs/build-system.md`.
+
+For Go changes, follow `docs/go-style.md`.
+For datastore adapters, follow `docs/adding-a-datastore.md` and run the shared store contract.

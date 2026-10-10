@@ -53,6 +53,8 @@ run_step() {
   if (( result != 0 )); then exit "$result"; fi
 }
 
+run_step bash packages/reconcile/dependencies/check.sh
+
 # Buck2 has finished the run target's build before it starts this command.
 run_step ./buck2 audit visibility //... toolchains//...
 if [[ -n $report_dir ]]; then
@@ -62,4 +64,5 @@ else
   run_step ./buck2 build //...
   run_step ./buck2 test //...
 fi
+run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash packages/reconcile/checks/adversarial.sh
 outcome=passed

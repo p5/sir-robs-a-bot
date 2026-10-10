@@ -1,5 +1,174 @@
-filegroup(
-    name = "files",
-    srcs = glob(["BUCK", "*.md"]),
+load("@prelude//tests:test_toolchain.bzl", "noop_test_toolchain")
+load("@prelude//toolchains:genrule.bzl", "system_genrule_toolchain")
+load("@prelude//toolchains:no_toolchain.bzl", "no_toolchain")
+load("@prelude//toolchains:python.bzl", "python_bootstrap_toolchain")
+load("@prelude//toolchains:remote_test_execution.bzl", "remote_test_execution_toolchain")
+load("@prelude//toolchains/go:go_bootstrap_toolchain.bzl", "go_bootstrap_distr", "go_bootstrap_toolchain")
+load("@prelude//toolchains/go:go_toolchain.bzl", "go_distr", "go_toolchain")
+
+http_archive(
+    name = "go_linux_amd64",
+    sha256 = "ecbadb99091a3f46e31f5f934b068b1864eafa7995211b39eaddf76996045fe5",
+    strip_prefix = "go",
+    sub_targets = {"gofmt": ["bin/gofmt"]},
+    urls = ["https://go.dev/dl/go1.27.2.linux-amd64.tar.gz"],
+)
+
+http_archive(
+    name = "python_linux_amd64",
+    sha256 = "ddc902fd26460f728758c67d80417c1031edf97589f1f162c4ba3aa158a35998",
+    strip_prefix = "python",
+    sub_targets = {"python": ["bin/python3"]},
+    urls = [
+        "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.14.8%2B20261009-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+    ],
+)
+
+http_archive(
+    name = "go_linux_arm64",
+    sha256 = "94f3e30b8e374bc285e7dadc11e0865726b9bc6e85b841ccceaabc0214c6b7c8",
+    strip_prefix = "go",
+    sub_targets = {"gofmt": ["bin/gofmt"]},
+    urls = ["https://go.dev/dl/go1.27.2.linux-arm64.tar.gz"],
+)
+
+http_archive(
+    name = "python_linux_arm64",
+    sha256 = "54f9cd13b97add6bbd077175b6d89f974cc582ece1c40ace1893067582edaf0e",
+    strip_prefix = "python",
+    sub_targets = {"python": ["bin/python3"]},
+    urls = [
+        "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.14.8%2B20261009-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+    ],
+)
+
+http_archive(
+    name = "go_darwin_amd64",
+    sha256 = "587b59182488b23aa6e5fc25110405a3e0e5b38ed2f5b2f46ed13c32aee356fe",
+    strip_prefix = "go",
+    sub_targets = {"gofmt": ["bin/gofmt"]},
+    urls = ["https://go.dev/dl/go1.27.2.darwin-amd64.tar.gz"],
+)
+
+http_archive(
+    name = "python_darwin_amd64",
+    sha256 = "0fe0c68a7f90458abd13b50a3d8f5f0cb5b2f0a1f33b6ef1445751cf2dc8b36e",
+    strip_prefix = "python",
+    sub_targets = {"python": ["bin/python3"]},
+    urls = [
+        "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.14.8%2B20261009-x86_64-apple-darwin-install_only_stripped.tar.gz"
+    ],
+)
+
+http_archive(
+    name = "go_darwin_arm64",
+    sha256 = "76812b213b1b2302c978d28fa52fa92d541704b9e7d9d5db8002c50e4018c4c5",
+    strip_prefix = "go",
+    sub_targets = {"gofmt": ["bin/gofmt"]},
+    urls = ["https://go.dev/dl/go1.27.2.darwin-arm64.tar.gz"],
+)
+
+http_archive(
+    name = "python_darwin_arm64",
+    sha256 = "936217c0e6893f51af939474bee18ecf5e6fe47b986d2c163f19b57c682e4a83",
+    strip_prefix = "python",
+    sub_targets = {"python": ["bin/python3"]},
+    urls = [
+        "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.14.8%2B20261009-aarch64-apple-darwin-install_only_stripped.tar.gz"
+    ],
+)
+
+command_alias(
+    name = "python",
+    exe = select({
+        "prelude//os:linux": select({"prelude//cpu:arm64": ":python_linux_arm64[python]", "prelude//cpu:x86_64": ":python_linux_amd64[python]"}),
+        "prelude//os:macos": select({"prelude//cpu:arm64": ":python_darwin_arm64[python]", "prelude//cpu:x86_64": ":python_darwin_amd64[python]"}),
+    }),
+    resources = [
+        select({
+            "prelude//os:linux": select({"prelude//cpu:arm64": ":python_linux_arm64", "prelude//cpu:x86_64": ":python_linux_amd64"}),
+            "prelude//os:macos": select({"prelude//cpu:arm64": ":python_darwin_arm64", "prelude//cpu:x86_64": ":python_darwin_amd64"}),
+        })
+    ],
+)
+
+python_bootstrap_toolchain(
+    name = "python_bootstrap",
+    interpreter = ":python",
+    visibility = ["prelude//...", "root//..."],
+)
+
+no_toolchain(name = "cxx", visibility = ["prelude//...", "root//..."])
+
+go_bootstrap_distr(
+    name = "go_bootstrap_distr",
+    go_os_arch = select({
+        "prelude//os:linux": select({"prelude//cpu:arm64": ("linux", "arm64"), "prelude//cpu:x86_64": ("linux", "amd64")}),
+        "prelude//os:macos": select({"prelude//cpu:arm64": ("darwin", "arm64"), "prelude//cpu:x86_64": ("darwin", "amd64")}),
+    }),
+    go_root = select({
+        "prelude//os:linux": select({"prelude//cpu:arm64": ":go_linux_arm64", "prelude//cpu:x86_64": ":go_linux_amd64"}),
+        "prelude//os:macos": select({"prelude//cpu:arm64": ":go_darwin_arm64", "prelude//cpu:x86_64": ":go_darwin_amd64"}),
+    }),
+)
+
+go_distr(
+    name = "go_distr",
+    go_os_arch = select({
+        "prelude//os:linux": select({"prelude//cpu:arm64": ("linux", "arm64"), "prelude//cpu:x86_64": ("linux", "amd64")}),
+        "prelude//os:macos": select({"prelude//cpu:arm64": ("darwin", "arm64"), "prelude//cpu:x86_64": ("darwin", "amd64")}),
+    }),
+    go_root = select({
+        "prelude//os:linux": select({"prelude//cpu:arm64": ":go_linux_arm64", "prelude//cpu:x86_64": ":go_linux_amd64"}),
+        "prelude//os:macos": select({"prelude//cpu:arm64": ":go_darwin_arm64", "prelude//cpu:x86_64": ":go_darwin_amd64"}),
+    }),
+    version = "1.27.2",
+)
+
+go_bootstrap_toolchain(
+    name = "go_bootstrap",
+    env_go_arch = select({"prelude//cpu:arm64": "arm64", "prelude//cpu:x86_64": "amd64"}),
+    env_go_os = select({"prelude//os:linux": "linux", "prelude//os:macos": "darwin"}),
+    go_bootstrap_distr = ":go_bootstrap_distr",
+    visibility = ["prelude//...", "root//..."],
+)
+
+go_toolchain(
+    name = "go",
+    env_go_arch = select({"prelude//cpu:arm64": "arm64", "prelude//cpu:x86_64": "amd64"}),
+    env_go_os = select({"prelude//os:linux": "linux", "prelude//os:macos": "darwin"}),
+    go_distr = ":go_distr",
+    visibility = ["prelude//...", "root//..."],
+)
+
+command_alias(
+    name = "gofmt",
+    exe = select({
+        "prelude//os:linux": select({"prelude//cpu:arm64": ":go_linux_arm64[gofmt]", "prelude//cpu:x86_64": ":go_linux_amd64[gofmt]"}),
+        "prelude//os:macos": select({"prelude//cpu:arm64": ":go_darwin_arm64[gofmt]", "prelude//cpu:x86_64": ":go_darwin_amd64[gofmt]"}),
+    }),
+    resources = [
+        select({
+            "prelude//os:linux": select({"prelude//cpu:arm64": ":go_linux_arm64", "prelude//cpu:x86_64": ":go_linux_amd64"}),
+            "prelude//os:macos": select({"prelude//cpu:arm64": ":go_darwin_arm64", "prelude//cpu:x86_64": ":go_darwin_amd64"}),
+        })
+    ],
     visibility = ["root//..."],
+)
+
+filegroup(name = "files", srcs = glob(["BUCK", "*.md"]), visibility = ["root//..."])
+
+noop_test_toolchain(name = "test", visibility = ["prelude//...", "root//..."])
+
+remote_test_execution_toolchain(name = "remote_test_execution", visibility = ["prelude//...", "root//..."])
+
+system_genrule_toolchain(name = "genrule", visibility = ["prelude//...", "root//..."])
+
+no_toolchain(name = "cxx_no_default_deps", visibility = ["prelude//...", "root//..."])
+
+platform(
+    name = "go_platform",
+    constraint_values = ["prelude//go/constraints:cgo_enabled[false]"],
+    deps = ["prelude//platforms:default"],
+    visibility = ["prelude//...", "root//..."],
 )

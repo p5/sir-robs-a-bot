@@ -40,7 +40,8 @@ See [Buck2 installation](https://buck2.build/docs/getting_started/install/).
 
 The source bundle declares scaffold inputs. It is not a release artifact.
 Future projects add targets such as `//services/<name>:<target>`.
-The scaffold contains no application targets.
+The reconciliation library has Go build and consumer-test targets.
+No factory application exists yet.
 
 ## Cells and execution
 
@@ -104,3 +105,19 @@ Keep agent workspaces and execution artifacts outside the source tree.
 
 See [repository tooling](../tooling/README.md) for individual checks and tool layout.
 See [tool maintenance](../tooling/README.md#update-tools) for release sources and upgrade procedures.
+
+## Go
+
+The reconciliation library uses hermetic Go 1.27.2 distributions.
+The toolchains cell pins archives and SHA-256 digests for Linux and macOS on x86_64 and ARM64.
+CGo is disabled for this first library.
+Go rule bootstrap scripts use pinned CPython 3.14.8 from python-build-standalone release 20261009.
+Neither Go nor Python needs to be installed on the host.
+
+The root target platform disables CGo for standalone libraries and test targets.
+Use the formatting command in the library guide for project-owned Go files.
+`packages/reconcile/go.mod` declares external Go dependencies. The bundled
+gobuckify generates vendored Buck targets from that module graph. Buck builds
+libraries and tests from those generated declarations. The repository verifier
+checks generated dependencies for drift.
+See [the library guide](../packages/reconcile/README.md) for current integration limits.

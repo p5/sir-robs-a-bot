@@ -55,3 +55,13 @@ Keep checkpoints in operator-selected storage outside the source tree.
 Use persistent storage when work must survive host loss.
 On resume, inspect the checkout and current external state before relying on the checkpoint.
 Recheck evidence if the code or environment changed.
+
+## Design and review skills
+
+Repository-local skills live in `.agents/skills/`.
+Use `architect` to compare consequential designs and test their critical assumptions.
+Use `interrogate` to challenge a design or change with concrete failure scenarios.
+Agents with repository skill discovery can select these skills by name.
+Other agents can read the [architect instructions](../.agents/skills/architect/SKILL.md) or [interrogate instructions](../.agents/skills/interrogate/SKILL.md) directly.
+Keep current task scope and authorization in force when you use a skill.
+See [attribution](../.agents/skills/NOTICE.md) for upstream sources and licensing.

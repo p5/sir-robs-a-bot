@@ -3,12 +3,17 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
-git diff --check
-git diff --cached --check
+git diff --check -- . ':(exclude)packages/reconcile/vendor/**'
+git diff --cached --check -- . ':(exclude)packages/reconcile/vendor/**'
 
 # Check committed files and new files with the same rules.
 git ls-files --cached --others --exclude-standard -z | while IFS= read -r -d '' file; do
   if [[ -f "$file" ]]; then
+    # Keep generated build metadata formatted, but preserve upstream sources.
+    case "$file" in
+      packages/reconcile/vendor/*/BUCK) ;;
+      packages/reconcile/vendor/*) continue ;;
+    esac
     case "$file" in
       *.sh)
         bash -n -- "$file"

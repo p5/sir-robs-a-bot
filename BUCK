@@ -3,6 +3,7 @@ load("//tooling/rules:repository_check.bzl", "repository_check")
 filegroup(
     name = "files",
     srcs = glob([
+        ".agents/skills/**",
         ".buckconfig",
         ".buckroot",
         ".editorconfig",

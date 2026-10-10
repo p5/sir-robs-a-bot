@@ -36,7 +36,7 @@ Pin compilers, runtimes, linkers, generators, and bootstrap tools that the rules
 Record host tools that remain required.
 
 Complete the language-specific checks in the [build integration guide](build-integration.md#acceptance-checks).
-The scaffold does not yet configure Go, Rust, or TypeScript builds.
+Go is configured for the reconciliation library. Rust and TypeScript integrations remain open.
 
 ## 3. Declare targets and dependencies
 
@@ -150,3 +150,5 @@ Confirm the following:
 
 Add a project template only after this integration has a real user.
 Test future templates through generated projects.
+
+For a coordination store adapter, see [adding a datastore](adding-a-datastore.md).

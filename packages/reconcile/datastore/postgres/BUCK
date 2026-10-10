@@ -1,0 +1,10 @@
+go_library(
+    name = "postgres",
+    deps = ["//packages/reconcile/datastore:datastore"],
+    embed_srcs = ["schema.sql"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile/datastore/postgres",
+    srcs = glob(["*.go"]),
+    tests = ["//packages/reconcile/datastore/postgres/tests:test"],
+    visibility = ["//packages/reconcile/..."],
+)
