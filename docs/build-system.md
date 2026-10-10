@@ -116,24 +116,39 @@ Neither Go nor Python needs to be installed on the host.
 
 The root target platform disables CGo for standalone libraries and test targets.
 Use the formatting command in the library guide for project-owned Go files.
-`packages/reconcile/go.mod` declares external Go dependencies. The bundled
-gobuckify generates vendored Buck targets from that module graph. Buck builds
-libraries and tests from those generated declarations. The repository verifier
-checks generated dependencies for drift.
-See [the library guide](../packages/reconcile/README.md) for current integration limits.
+Each Go project owns its `go.mod` and `go.sum`. The root `go.work` enrolls projects
+in one workspace. Go selects one external version per module for workspace builds.
+`go work vendor` produces one root `vendor/` tree. Buck uses generated targets in
+that tree. No project stores dependencies for another project.
 
-The intake service uses its own Go module with local replacements for the
-reconciliation and resource libraries. It reuses their generated dependency
-projections and retains only additional dependency packages in its vendor tree.
-Its verifier checks module metadata, selected versions, and generated targets.
-Regenerate the service projection after changing its module dependencies.
+Run these commands after a dependency change:
 
-## Resource dependencies
+```sh
+GOWORK=off ./buck2 run 'toolchains//:go[go]' -- -C PROJECT mod tidy
+bash tooling/go/generate.sh
+bash tooling/go/check.sh
+```
 
-The resource module owns its dependencies in `packages/resources/go.mod` and
-`go.sum`. Its generator uses the bundled gobuckify and reuses identical packages
-from the queue module's generated projection. Only additional packages remain in
-`packages/resources/vendor`. Python 3 runs the deterministic projection step.
-Run `bash packages/resources/dependencies/generate.sh` after dependency changes.
-The root verifier regenerates and compares this projection. Native Go checks use
-`-mod=mod`; the Buck projection is intentionally not a complete native vendor tree.
+The generator stages the workspace outside the checkout. It runs the pinned Go
+vendor command and bundled gobuckify, then publishes the completed vendor tree.
+The generator supplies a temporary, dependency-free `go.mod` because gobuckify
+requires a module name to exclude this repository's packages. That file is not a
+workspace member and does not declare or resolve dependencies.
+
+The check verifies workspace membership, independently tidied module manifests,
+vendor sources, and generated Buck targets. Native package loading also checks
+that the standard workspace vendor tree works without Buck. Project race and
+integration checks run with `GOWORK=off` to expose dependency errors that the
+workspace could hide. Local replacements remain in project manifests so those
+independent checks can resolve unpublished repository libraries.
+
+Go tools and editors discover `go.work` from a project directory. For example:
+
+```sh
+./buck2 run 'toolchains//:go[go]' -- -C services/intake test ./internal/...
+```
+
+This uses workspace vendoring by default. Do not set a global `-mod=mod` override.
+Use `GOWORK=off` and `-mod=readonly` for independent checks. Do not edit vendor
+sources or generated Buck targets. See [Go workspace tooling](../tooling/go/README.md)
+for project enrollment, version selection, and generator limits.

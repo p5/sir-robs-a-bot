@@ -69,14 +69,15 @@ fixtures, PostgreSQL, and the AWS SDK with DynamoDB Local and an S3 HTTP fixture
 Go 1.27.2 comes from the pinned toolchain. CGo is disabled for the artifact.
 Native race verification requires a host C compiler. This module uses local
 reconciliation and resource modules through Go `replace` directives.
-`go.mod` owns dependencies. Generated Buck projections reuse matching packages
-from those libraries and retain only additional SDK packages in this service.
+`go.mod` owns dependencies. The root `go.work` joins the service and libraries.
+Standard workspace vendoring and generated Buck targets share one root vendor
+tree. Independent checks disable the workspace and keep local replacements.
 
 Update dependencies with the pinned toolchain, then regenerate Buck metadata:
 
 ```sh
-./buck2 run 'toolchains//:go[go]' -- -C services/intake mod tidy
-bash services/intake/dependencies/generate.sh
+GOWORK=off ./buck2 run 'toolchains//:go[go]' -- -C services/intake mod tidy
+bash tooling/go/generate.sh
 ```
 
 Do not edit dependency versions in Buck files or format upstream vendor sources.

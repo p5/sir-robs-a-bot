@@ -64,6 +64,10 @@ Use project-local source patterns.
 Broad globs can include fixtures, caches, or unrelated files.
 Review source discovery after you add or delete files.
 
+For a Go project, follow [workspace enrollment](../tooling/go/README.md#add-a-go-project).
+Each project keeps its own module manifest. Add it to `go.work` and regenerate
+the shared vendor tree. The repository check rejects unenrolled Go modules.
+
 ## 4. Add behavior checks
 
 Add actual test targets for the project's external behavior.

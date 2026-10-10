@@ -115,7 +115,7 @@ is independent. A rejected acknowledgement does not reject accepted work.
 Add Buck targets and wire the adapter into the service host with explicit
 credentials and configuration. Add its packages to `checks/verify.sh` so the
 verifier discovers every fuzz target. Keep the dependency source of truth in the
-Go module and its generated Buck projection.
+Go module and regenerate the shared workspace vendor targets.
 
 Test malformed inputs, unauthorized actors, changed source provenance, duplicate
 delivery, connection isolation, rate limits, cancellation, and acknowledgement

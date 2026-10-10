@@ -46,6 +46,7 @@ Add other language toolchains with their first projects.
 | `packages/` | Shared libraries with explicit users |
 | `contracts/` | Cross-language interface definitions |
 | `tooling/` | Repository checks and development tools |
+| `vendor/` | Generated external Go sources and Buck targets |
 | `toolchains/` | Build toolchains, added as projects require them |
 | `templates/` | Project templates, added with their first real users |
 | `evaluations/` | Agent task scenarios and fixtures |

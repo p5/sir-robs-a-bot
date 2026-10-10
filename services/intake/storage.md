@@ -177,7 +177,7 @@ export PATH="$PWD/.tools/bin:$PATH"
 outputs=$(./buck2 build //services/intake/cmd:intake --show-full-json-output)
 export INTAKE_BINARY=$(printf '%s' "$outputs" | ./tooling/bin/jq -er 'values | .[]')
 INTAKE_LIVE_AWS=1 ./buck2 run 'toolchains//:go[go]' -- -C services/intake \
-  test -mod=mod -v -count=1 -timeout=10m ./tests -run '^TestAWS'
+  test -v -count=1 -timeout=10m ./tests -run '^TestAWS'
 ```
 
 These tests write real S3 objects and DynamoDB records. They cover the shared

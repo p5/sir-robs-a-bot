@@ -27,10 +27,10 @@ export CGO_ENABLED=1
 outputs=$(./buck2 build //packages/resources/examples/request-run/cmd:request-run --show-full-json-output)
 RESOURCE_PROTOTYPE_BINARY=$(printf '%s' "$outputs" | ./tooling/bin/jq -er 'values | .[]')
 export RESOURCE_PROTOTYPE_BINARY
-run_go vet -mod=mod ./...
-run_go test -mod=mod -race -count=1 -timeout=2m ./...
+run_go vet -mod=readonly ./...
+run_go test -mod=readonly -race -count=1 -timeout=2m ./...
 for package in ./tests/unit ./content/s3 ./datastore/dynamodb; do
-  listing=$(run_go test -mod=mod -list '^Fuzz' "$package")
+  listing=$(run_go test -mod=readonly -list '^Fuzz' "$package")
   targets=()
   while IFS= read -r line; do
     if [[ $line =~ ^Fuzz[A-Za-z0-9_]+$ ]]; then targets+=("$line"); fi
@@ -40,7 +40,7 @@ for package in ./tests/unit ./content/s3 ./datastore/dynamodb; do
     exit 1
   fi
   for target in "${targets[@]}"; do
-    run_go test -mod=mod "$package" -run='^$' -fuzz="^${target}$" -fuzztime=10s -parallel=2 -timeout=2m
+    run_go test -mod=readonly "$package" -run='^$' -fuzz="^${target}$" -fuzztime=10s -parallel=2 -timeout=2m
   done
 done
 printf '%s\n' 'Resource vet, race, integration, prototype, and fuzz checks passed.'

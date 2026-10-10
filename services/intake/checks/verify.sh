@@ -40,21 +40,14 @@ export GOWORK=off
 run_go() {
   "$root/buck2" run 'toolchains//:go[go]' -- -C "$workspace/services/intake" "$@"
 }
-run_go mod tidy
-diff -u services/intake/go.mod "$workspace/services/intake/go.mod"
-diff -u services/intake/go.sum "$workspace/services/intake/go.sum"
-# Regenerate the service-owned projection. Its generator checks versions before
-# reusing packages from the resource and reconciliation projections.
-bash services/intake/dependencies/generate.sh "$workspace/services/intake"
-diff -ru services/intake/vendor "$workspace/services/intake/vendor"
 outputs=$(./buck2 build //services/intake/cmd:intake --show-full-json-output)
 INTAKE_BINARY=$(printf '%s' "$outputs" | ./tooling/bin/jq -er 'values | .[]')
 export INTAKE_BINARY
 export CGO_ENABLED=1
-run_go vet -mod=mod ./...
-run_go test -mod=mod -race -count=1 -timeout=2m ./...
+run_go vet -mod=readonly ./...
+run_go test -mod=readonly -race -count=1 -timeout=2m ./...
 for package in ./internal/providers/github ./internal/providers/gitlab ./internal/intake ./internal/persistence; do
-  listing=$(run_go test -mod=mod -list '^Fuzz' "$package")
+  listing=$(run_go test -mod=readonly -list '^Fuzz' "$package")
   targets=()
   while IFS= read -r line; do
     if [[ $line =~ ^Fuzz[A-Za-z0-9_]+$ ]]; then targets+=("$line"); fi
@@ -64,7 +57,7 @@ for package in ./internal/providers/github ./internal/providers/gitlab ./interna
     exit 1
   fi
   for target in "${targets[@]}"; do
-    run_go test -mod=mod "$package" -run='^$' -fuzz="^${target}$" -fuzztime=10s -parallel=2 -timeout=2m
+    run_go test -mod=readonly "$package" -run='^$' -fuzz="^${target}$" -fuzztime=10s -parallel=2 -timeout=2m
   done
 done
-printf '%s\n' 'Intake module graph, vet, race, integration, and fuzz checks passed.'
+printf '%s\n' 'Intake vet, race, integration, and fuzz checks passed.'

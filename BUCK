@@ -14,6 +14,8 @@ filegroup(
         "*.md",
         "BUCK",
         "buck2",
+        "go.work",
+        "go.work.sum",
         "docs/**",
     ]),
     visibility = ["//tooling/tests:repository-tools-test"],

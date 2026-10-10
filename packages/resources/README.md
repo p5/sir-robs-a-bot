@@ -140,7 +140,7 @@ export PATH="$PWD/.tools/bin:$PATH"
 ./buck2 build //packages/resources/...
 ./buck2 test //packages/resources/...
 ./buck2 run toolchains//:gofmt -- -w packages/resources/content packages/resources/datastore packages/resources/examples packages/resources/tests packages/resources/repository.go
-bash packages/resources/dependencies/check.sh
+bash tooling/go/check.sh
 bash packages/resources/checks/verify.sh
 ./buck2 run //tooling:verify
 ```
@@ -153,17 +153,16 @@ behavior, IAM, AWS failover, or compatibility with another object provider.
 The executable prototype proves the public resource and reconciler interfaces.
 There is no deployment or workload execution in this project.
 
-`go.mod` and `go.sum` own dependencies. Run
-`bash packages/resources/dependencies/generate.sh` after dependency changes.
-The pinned bundled gobuckify generates Buck targets. The projection reuses
-identical packages from the reconciliation module's vendor tree and retains only
-additional sources here. Shared packages must select identical module versions.
-No dependency is added to the queue module solely for this library. Do not edit
-generated sources or Buck files by hand. Native Go checks use `-mod=mod` because
-the projected vendor tree intentionally omits shared packages and local modules.
-Dependency regeneration requires Python 3 in addition to repository bootstrap
-tools. Buck artifacts include Go archives and the prototype executable. This
-project supports the same Linux/macOS and amd64/arm64 toolchains as the core.
+`go.mod` and `go.sum` own this project's dependencies. The root `go.work` enrolls
+it alongside its consumers. Run `bash tooling/go/generate.sh` after dependency
+changes. Standard workspace vendoring creates one root vendor tree, and the
+pinned gobuckify generates its Buck targets. Do not edit those generated files.
+
+Native Go tools use workspace vendoring by default. Independent project checks
+set `GOWORK=off` and `-mod=readonly`. Local module replacements support these
+checks without published versions. Buck artifacts include Go archives and the
+prototype executable. This project supports the same Linux/macOS and amd64/arm64
+toolchains as the core. See [workspace tooling](../../tooling/go/README.md).
 
 ## Add an adapter
 
