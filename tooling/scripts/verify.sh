@@ -13,12 +13,12 @@ if [[ -n ${BUCK2_REPORT_DIR:-} ]]; then
   esac
   report_dir=$(mktemp -d "$report_parent/verification.XXXXXX")
   revision=$(git rev-parse HEAD)
-  worktree_status=$(git status --porcelain=v1 --untracked-files=all)
+  git status --porcelain=v1 --untracked-files=all >"$report_dir/worktree-status.txt"
   started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
   write_report() {
     ./tooling/bin/jq -n \
-      --arg revision "$revision" --arg worktree_status "$worktree_status" \
+      --arg revision "$revision" --rawfile worktree_status "$report_dir/worktree-status.txt" \
       --arg started_at "$started_at" --arg outcome "$outcome" \
       --argjson exit_code "$1" --argjson steps "$steps" \
       '{schema_version: 1, revision: $revision, worktree_status: $worktree_status,
@@ -53,7 +53,7 @@ run_step() {
   if (( result != 0 )); then exit "$result"; fi
 }
 
-run_step bash packages/reconcile/dependencies/check.sh
+run_step bash tooling/go/check.sh
 
 # Buck2 has finished the run target's build before it starts this command.
 run_step ./buck2 audit visibility //... toolchains//...
@@ -65,4 +65,6 @@ else
   run_step ./buck2 test //...
 fi
 run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash packages/reconcile/checks/adversarial.sh
+run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash services/intake/checks/verify.sh
+run_step env FACTORY_TEST_REPORT_DIR="$report_dir" bash packages/resources/checks/verify.sh
 outcome=passed

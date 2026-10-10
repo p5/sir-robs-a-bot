@@ -1,0 +1,16 @@
+filegroup(
+    name = "rules",
+    srcs = ["rules.bzl"],
+    visibility = ["//vendor/..."],
+)
+
+filegroup(
+    name = "files",
+    srcs = glob(["BUCK", "*.sh", "*.json", "*.bzl", "*.md"]),
+    visibility = ["//tooling:files"],
+)
+
+sh_binary(
+    name = "test",
+    main = "tests.sh",
+)

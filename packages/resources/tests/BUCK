@@ -1,0 +1,23 @@
+go_test(
+    name = "test",
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/reconcile/datastore/dynamodb:dynamodb",
+        "//packages/reconcile/datastore/memory:memory",
+        "//packages/resources:resources",
+        "//packages/resources/content:content",
+        "//packages/resources/content/s3:s3",
+        "//packages/resources/datastore:datastore",
+        "//packages/resources/datastore/dynamodb:dynamodb",
+        "//packages/resources/datastore/storetest:storetest",
+        "//packages/resources/examples/request-run:request-run",
+        "//vendor/github.com/aws/aws-sdk-go-v2/aws:aws",
+        "//vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb:dynamodb",
+        "//vendor/github.com/aws/aws-sdk-go-v2/service/dynamodb/types:types",
+        "//vendor/github.com/aws/aws-sdk-go-v2/service/s3:s3",
+    ],
+    env = {"RESOURCE_PROTOTYPE_BINARY": "$(exe //packages/resources/examples/request-run/cmd:request-run)"},
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources/tests",
+    srcs = glob(["*.go"]),
+)

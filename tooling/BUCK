@@ -5,6 +5,7 @@ filegroup(
         "README.md": "README.md",
         "bin": "//tooling/bin:files",
         "checks": "//tooling/checks:files",
+        "go": "//tooling/go:files",
         "rules": "//tooling/rules:files",
         "scripts": "//tooling/scripts:files",
         "tests": "//tooling/tests:files",

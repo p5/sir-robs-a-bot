@@ -53,7 +53,7 @@ They read checkout contents and Git state.
 Vendored Go sources retain upstream whitespace and scripts; repository lint does
 not rewrite or lint them. Generated vendor Buck files still use repository
 formatting. The dependency drift check verifies all vendored files against the
-pinned module graph.
+pinned workspace graph. See [Go workspace tooling](go/README.md).
 Do not reuse this rule for hermetic application tests.
 
 The launcher validator checks local consistency, not upstream release freshness.

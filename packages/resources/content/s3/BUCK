@@ -1,0 +1,19 @@
+go_library(
+    name = "s3",
+    deps = [
+        "//packages/resources/content:content",
+        "//vendor/github.com/aws/aws-sdk-go-v2/aws:aws",
+        "//vendor/github.com/aws/aws-sdk-go-v2/service/s3:s3",
+        "//vendor/github.com/aws/smithy-go:smithy-go",
+    ],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources/content/s3",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    visibility = ["//packages/resources/...", "//services/intake/..."],
+)
+
+go_test(
+    name = "test",
+    srcs = glob(["*_test.go"]),
+    target_under_test = ":s3",
+)

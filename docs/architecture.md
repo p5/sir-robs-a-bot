@@ -2,7 +2,9 @@
 
 This document defines the intended core of the agent software factory.
 It describes a design to implement. The repository contains the build scaffold and an initial reconciliation library.
-The library includes PostgreSQL and DynamoDB adapters. The factory application remains to be implemented.
+The library includes PostgreSQL and DynamoDB adapters. The initial [factory entrypoint](../services/intake/README.md) accepts GitHub and GitLab mentions
+through account polling and signed webhooks, then stores durable requests. Agent execution
+and GitHub publication remain to be implemented.
 
 The factory supports software development and agent-powered applications through a shared execution platform.
 We will build the core ourselves, with no DriftlessAF dependency or compatibility requirement.
@@ -65,7 +67,14 @@ Software workflows own repository preparation, candidate changes, and code verif
 Other applications can define different outputs and acceptance checks.
 
 The reconciliation library has the factory as its intended consumer.
-Keep factory-specific modules private to that application.
+Keep implementation private to the project that owns each capability.
+The factory is not one Go application or module. The intake service is one project with its own module, artifact, data, and
+verification. GitHub, GitLab, Jira, and Slack belong in provider adapters within
+intake. Intake owns provider-neutral request persistence and delivery obligations.
+Provider adapters own discovery, identity checks, authorization, and acknowledgements.
+Add workflow control and execution projects when their first
+implementations require them. Shared project boundaries do not require a
+separate deployment for every module.
 Extract other shared packages when another application needs them.
 Add interfaces at actual substitution or testing seams. Avoid wrappers that only forward calls.
 
@@ -232,6 +241,11 @@ Cloudflare native services remain candidates, subject to contract tests and cons
 The memory adapter has no persistence or cross-process ownership.
 The queue store owns due-work discovery, claims, diagnostics, and fenced queue completion.
 Consuming services own desired state and observations. See [the ownership decision](adr/0004-key-based-reconciler-queue.md).
+The [resource library](../packages/resources/README.md) implements immutable snapshot
+content, versioned application state, and durable queue delivery as a separate module.
+Its S3 and DynamoDB adapters are exercised by a request-to-run prototype. Intake
+uses S3 and DynamoDB by default. The service is not deployed and has no legacy
+data migration requirement.
 Artifact storage is a separate capability and can use deployment-native object storage.
 Keep artifact contents immutable after capture and refer to them by stable content identities.
 Commit terminal results only after their referenced artifacts are durable.

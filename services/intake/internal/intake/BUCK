@@ -1,0 +1,27 @@
+go_library(
+    name = "intake",
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/resources:resources",
+        "//packages/resources/content:content",
+        "//packages/resources/datastore:datastore",
+    ],
+    embed_srcs = ["schema.sql"],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/services/intake/internal/intake",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    tests = [":test", "//services/intake/tests:test"],
+    visibility = ["//services/intake/..."],
+)
+
+go_test(
+    name = "test",
+    deps = [
+        "//packages/resources/content/memory:memory",
+        "//packages/resources/datastore/memory:memory",
+    ],
+    embed_srcs = ["schema.sql"],
+    srcs = glob(["*_test.go"]),
+    target_under_test = ":intake",
+)

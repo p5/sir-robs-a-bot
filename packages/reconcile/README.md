@@ -75,8 +75,9 @@ The clock harness under `internal/teststore` wraps the public memory adapter.
 PostgreSQL and DynamoDB integration tests require Podman or Docker. They launch and remove isolated datastore containers. The `fmt-check` target checks project-owned Go files.
 
 `go.mod` declares external Go dependencies. Run
-`packages/reconcile/dependencies/generate.sh` after dependency changes.
-The bundled gobuckify generates Buck targets from the vendored module graph.
+`bash tooling/go/generate.sh` after dependency changes.
+The root Go workspace selects dependencies. The bundled gobuckify generates
+Buck targets in the shared root vendor tree.
 Do not edit vendored code or generated targets by hand.
 The repository verifier regenerates dependencies in a temporary directory and
 checks module metadata, vendored sources, and Buck targets for drift.

@@ -1,0 +1,13 @@
+go_library(
+    name = "request-run",
+    deps = [
+        "//packages/reconcile:reconcile",
+        "//packages/reconcile/datastore:datastore",
+        "//packages/resources:resources",
+        "//packages/resources/datastore:datastore",
+    ],
+    override_cgo_enabled = False,
+    package_name = "github.com/p5/sir-robs-a-bot/packages/resources/examples/request-run",
+    srcs = glob(["*.go"], exclude = ["*_test.go"]),
+    visibility = ["//packages/resources/..."],
+)

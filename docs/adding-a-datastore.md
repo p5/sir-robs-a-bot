@@ -60,7 +60,7 @@ Share implementation helpers only when two adapters actually need them.
    acknowledged writes, and competing clients. Test backend limits and migrations.
    Document which failure modes the tests do not cover.
 8. Declare the Go dependency in `packages/reconcile/go.mod`, then run
-   `packages/reconcile/dependencies/generate.sh`. This generates vendored sources
+   `bash tooling/go/generate.sh`. This generates vendored sources
    and Buck targets with the bundled gobuckify. Do not edit generated targets.
 9. Add a Buck library and a consumer test target. Copy the PostgreSQL targets'
    structure and change the package paths and dependencies. Keep CGo disabled

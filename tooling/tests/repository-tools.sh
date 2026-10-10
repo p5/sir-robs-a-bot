@@ -83,21 +83,23 @@ rm -- .github/workflows/invalid.yml
 
 # Vendored sources retain upstream formatting and scripts. Generated Buck
 # metadata still follows repository formatting and the dependency drift check.
-mkdir -p packages/reconcile/vendor/example
-printf 'trailing space \n' >packages/reconcile/vendor/example/README.md
-printf 'if then\n' >packages/reconcile/vendor/example/upstream.sh
+mkdir -p vendor/example
+printf 'trailing space \n' >vendor/example/README.md
+printf 'if then\n' >vendor/example/upstream.sh
 bash tooling/checks/repository.sh >"$fixture_root/result.log" 2>&1
 bash tooling/checks/lint.sh >"$fixture_root/result.log" 2>&1
-git add packages/reconcile/vendor
+git add vendor
 bash tooling/checks/repository.sh >"$fixture_root/result.log" 2>&1
-printf 'value=[1,2]\n' >packages/reconcile/vendor/example/BUCK
+printf 'value=[1,2]\n' >vendor/example/BUCK
 expect_failure 'format Starlark files' bash tooling/checks/repository.sh
 bash tooling/scripts/format-starlark.sh >"$fixture_root/result.log" 2>&1
 bash tooling/checks/repository.sh >"$fixture_root/result.log" 2>&1
 
 # Exercise the verifier with a disposable command, not recursive Buck builds.
-mkdir -p packages/reconcile/dependencies packages/reconcile/checks
-printf '#!/usr/bin/env bash\nexit 0\n' >packages/reconcile/dependencies/check.sh
+mkdir -p tooling/go packages/reconcile/checks services/intake/checks packages/resources/checks
+printf '#!/usr/bin/env bash\nexit 0\n' >tooling/go/check.sh
+printf '#!/usr/bin/env bash\nexit 0\n' >services/intake/checks/verify.sh
+printf '#!/usr/bin/env bash\nexit 0\n' >packages/resources/checks/verify.sh
 cat >packages/reconcile/checks/adversarial.sh <<'CHECK'
 #!/usr/bin/env bash
 if [[ ${VERIFY_FAIL_STEP:-} == adversarial ]]; then exit 42; fi
@@ -116,6 +118,13 @@ printf 'changed\n' >>.starlark-format.json
 printf 'untracked\n' >'untracked input.txt'
 export VERIFY_COMMAND_LOG="$fixture_root/verify-commands.log"
 export BUCK2_REPORT_DIR="$fixture_root/reports with spaces"
+# A large rename can exceed the OS argument limit if status is passed to jq
+# as one argument. Reports must preserve the complete status through a file.
+mkdir large-status
+printf -v status_suffix '%0180d' 0
+for ((index = 0; index < 2000; index++)); do
+  : >"large-status/entry-$index-$status_suffix"
+done
 for failed_step in audit build test adversarial none; do
   export VERIFY_FAIL_STEP=$failed_step
   : >"$VERIFY_COMMAND_LOG"
@@ -130,15 +139,17 @@ for failed_step in audit build test adversarial none; do
     audit) count=2 ;;
     build) count=3 ;;
     test) count=4 ;;
-    adversarial|none) count=5 ;;
+    adversarial) count=5 ;;
+    none) count=7 ;;
   esac
   ./tooling/bin/jq -e --arg revision "$(git rev-parse HEAD)" \
     --arg failed_step "$failed_step" --argjson count "$count" '
     .schema_version == 1 and .revision == $revision and
     (.worktree_status | contains(" M .starlark-format.json")) and
     (.worktree_status | contains("?? \"untracked input.txt\"")) and
+    (.worktree_status | length) > 300000 and
     (.steps | length) == $count and
-    .steps[0].command == ["bash", "packages/reconcile/dependencies/check.sh"] and
+    .steps[0].command == ["bash", "tooling/go/check.sh"] and
     .steps[1].command == ["./buck2", "audit", "visibility", "//...", "toolchains//..."] and
     (if $failed_step == "none" then
        .outcome == "passed" and .exit_code == 0 and all(.steps[]; .exit_code == 0)
@@ -146,10 +157,22 @@ for failed_step in audit build test adversarial none; do
        .outcome == "failed" and .exit_code == 42 and .steps[-1].exit_code == 42
      end)' "$report/verification.json" >/dev/null
   buck_commands=$((count - 1))
-  if [[ $failed_step == adversarial || $failed_step == none ]]; then buck_commands=$((count - 2)); fi
+  if [[ $failed_step == adversarial ]]; then buck_commands=$((count - 2)); fi
+  if [[ $failed_step == none ]]; then buck_commands=$((count - 4)); fi
   [[ $(wc -l <"$VERIFY_COMMAND_LOG") -eq $buck_commands ]]
 done
 [[ $(find "$BUCK2_REPORT_DIR" -name verification.json | wc -l) -eq 5 ]]
+# A failed application check must also fail the aggregate verifier and report.
+mkdir -p services/intake/checks
+printf 'module fixture\n' >services/intake/go.mod
+printf '#!/usr/bin/env bash\nexit 42\n' >services/intake/checks/verify.sh
+export VERIFY_FAIL_STEP=none
+expect_failure 'Verification reports:' bash tooling/scripts/verify.sh
+report=$(sed -n 's/^Verification reports: //p' "$fixture_root/result.log")
+./tooling/bin/jq -e '.outcome == "failed" and .exit_code == 42 and
+  (.steps | length) == 6 and
+  .steps[-1].command[-1] == "services/intake/checks/verify.sh"' "$report/verification.json" >/dev/null
+rm -rf services
 export BUCK2_REPORT_DIR="$checkout/forbidden-reports"
 expect_failure 'Keep verification reports outside the source tree.' bash tooling/scripts/verify.sh
 unset BUCK2_REPORT_DIR VERIFY_FAIL_STEP VERIFY_COMMAND_LOG

@@ -9,7 +9,7 @@ git ls-files --cached --others --exclude-standard -z | {
   while IFS= read -r -d '' file; do
     [[ -f "$file" ]] || continue
     # Dependency sources remain byte-for-byte upstream; check them for drift.
-    [[ $file == packages/reconcile/vendor/* ]] && continue
+    [[ $file == vendor/* ]] && continue
     case "$file" in
       *.sh) scripts+=("./$file") ;;
       .github/workflows/*.yml|.github/workflows/*.yaml) workflows+=("./$file") ;;

@@ -2,13 +2,13 @@ go_library(
     name = "reconcile",
     deps = [
         "//packages/reconcile/datastore:datastore",
-        "//packages/reconcile/vendor/github.com/prometheus/client_golang/prometheus:prometheus",
+        "//vendor/github.com/prometheus/client_golang/prometheus:prometheus",
     ],
     override_cgo_enabled = False,
     package_name = "github.com/p5/sir-robs-a-bot/packages/reconcile",
     srcs = glob(["*.go"], exclude = ["*_test.go"]),
     tests = ["//packages/reconcile/tests:test"],
-    visibility = ["//packages/reconcile/..."],
+    visibility = ["//packages/reconcile/...", "//packages/resources/...", "//services/intake/..."],
 )
 
 genrule(

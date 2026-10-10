@@ -1,0 +1,6 @@
+genrule(
+    name = "fmt-check",
+    cmd = '$(exe toolchains//:gofmt) -l $SRCS > "$OUT"; test ! -s "$OUT"',
+    out = "unformatted.txt",
+    srcs = glob(["**/*.go"], exclude = ["vendor/**"]),
+)

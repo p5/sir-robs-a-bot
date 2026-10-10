@@ -27,6 +27,14 @@ export PATH="$PWD/.tools/bin:$PATH"
 The scaffold checks shell syntax, whitespace, Starlark formatting, workflows, and tool pins.
 Run `./buck2 run //tooling:fmt` to apply Starlark formatting.
 The [reconciliation library](packages/reconcile/README.md) uses the pinned Go toolchain.
+The [factory entrypoint](services/intake/README.md) accepts GitHub and GitLab mentions
+as durable requests through polling and signed webhooks. It includes a read-only
+probe for live mention discovery.
+The [resource library](packages/resources/README.md) separates immutable content,
+versioned application state, and recoverable queue delivery. Its request-to-run
+prototype exercises S3 and DynamoDB adapters. Intake supports
+S3 and DynamoDB by default, with independent factory dispatch and recoverable
+receipts.
 Add other language toolchains with their first projects.
 
 ## Repository layout
@@ -38,6 +46,7 @@ Add other language toolchains with their first projects.
 | `packages/` | Shared libraries with explicit users |
 | `contracts/` | Cross-language interface definitions |
 | `tooling/` | Repository checks and development tools |
+| `vendor/` | Generated external Go sources and Buck targets |
 | `toolchains/` | Build toolchains, added as projects require them |
 | `templates/` | Project templates, added with their first real users |
 | `evaluations/` | Agent task scenarios and fixtures |
